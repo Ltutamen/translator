@@ -22,15 +22,6 @@ std::map<LexemTypes, std::string> LexemType::names = {
 
 
 Lexer::Lexer(std::string _inputFilePath) : lexems(0), inputFilePath(std::move(_inputFilePath)) {
-
-    this->constants.insert(new Constant(std::string("program"), LexemTypes::DEFINED_VAR, ConstantPosition(0, 0, 0, 0)));
-    this->constants.insert(new Constant(std::string("defunc"), LexemTypes::DEFINED_VAR, ConstantPosition(0, 0, 0, 0)));
-    this->constants.insert(new Constant(std::string("begin"), LexemTypes::DEFINED_VAR, ConstantPosition(0, 0, 0, 0)));
-    this->constants.insert(new Constant(std::string("end"), LexemTypes::DEFINED_VAR, ConstantPosition(0, 0, 0, 0)));
-
-    this->constants.insert(new Constant(std::string("*<"), LexemTypes::COMMENT, ConstantPosition(0, 0, 0, 0)));
-    this->constants.insert(new Constant(std::string(">*"), LexemTypes::COMMENT, ConstantPosition(0, 0, 0, 0)));
-
     //  this->variables.push_front(new Variable("asasd"));
 
     this->keywords.insert(new Keyword("begin"));
@@ -61,9 +52,6 @@ Lexem*  Lexer::getLexemThatMatches(std::set<Lexem*>set, std::string key) {
     return nullptr;
 }
 
-void Lexer::initLexems() {
-
-}
 
 void Lexer::initCharacters() {
     for (int i = 0; i <= 7; ++i) {
@@ -125,7 +113,9 @@ void Lexer::process() {
                     if(setContains(keywords, word)) {
                         lexems.push_back(getLexemThatMatches(keywords, word));
                     } else {
-                        lexems.push_back(new Constant(word, ConstantPosition(i, lineN, i + word.length(), lineN), constants));
+                        auto* con = new Constant(word, LexemTypes::CONSTANT_VAR, ConstantPosition(i, lineN, i + word.length(), lineN));
+                        lexems.push_back(con);
+                        constants.insert(con);
                     }
 
                     i += word.length() - 1;
@@ -151,7 +141,7 @@ void Lexer::process() {
                                 i = 0;
                             }
                         }
-
+                        ++i;
                     }
                     //  "/" sign
                     else {
@@ -161,7 +151,6 @@ void Lexer::process() {
                                         LexemTypes::OPERAND,
                                         ConstantPosition(lineN, i, lineN, i)));
                     }
-                    ++i;
                 }
             }
         } catch (int positionInLine) {

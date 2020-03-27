@@ -28,8 +28,6 @@ private:
     //  todo lexem pool
     std::list<Lexem*> lexems;
 
-    void initToStringMaps();
-    void initLexems();
     void initCharacters();
     std::string wordExtraction(const char* line);
     std::string unsignedExtraction(const char* line);
