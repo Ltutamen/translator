@@ -43,7 +43,7 @@ Lexer::Lexer(std::string _inputFilePath) : lexems(0), inputFilePath(std::move(_i
 
 }
 
-bool setContains(std::set<Lexem*> set, std::string key) {
+bool Lexer::setContains(std::set<Lexem*> set, std::string key) {
     for (auto it = set.begin(); it != set.end(); ++it) {
         if((*it)->name == key) {
             return true;
@@ -52,7 +52,7 @@ bool setContains(std::set<Lexem*> set, std::string key) {
     return false;
 }
 
-Lexem* getLexemThatMatches(std::set<Lexem*>set, std::string key) {
+Lexem*  Lexer::getLexemThatMatches(std::set<Lexem*>set, std::string key) {
     for (auto it = set.begin(); it != set.end(); ++it) {
         if((*it)->name == key) {
             return (*it);
@@ -123,20 +123,18 @@ void Lexer::process() {
                     //  words, constants
                     std::string word = wordExtraction(&line[i]);
                     if(setContains(keywords, word)) {
-                        std::cerr << "keyword:" << word << '\n';
                         lexems.push_back(getLexemThatMatches(keywords, word));
                     } else {
-                        std::cerr << "variable:" << word << '\n';
-                        lexems.push_front(new Constant(word, ConstantPosition(i, lineN, i + word.length(), lineN), constants));
+                        lexems.push_back(new Constant(word, ConstantPosition(i, lineN, i + word.length(), lineN), constants));
                     }
 
                     i += word.length() - 1;
                 } else if(characters[line[i]] == CharacterTypes::DIGIT) {
                     std::string sunsigned = unsignedExtraction(&line[i]);
-                    lexems.push_front(new Constant(sunsigned, LexemTypes::UNSIGNED, ConstantPosition(lineN, i, lineN, i + sunsigned.length())));
+                    lexems.push_back(new Constant(sunsigned, LexemTypes::UNSIGNED, ConstantPosition(lineN, i, lineN, i + sunsigned.length())));
                     i += sunsigned.length() - 1;
                 } else if(characters[line[i]] == CharacterTypes::SINGLED_DIV) {
-                    lexems.push_front(SingleElm::getSingleElm(std::string(1,  line[i])));
+                    lexems.push_back(SingleElm::getSingleElm(std::string(1,  line[i])));
                 } else if(characters[line[i]] == CharacterTypes::SINGLED_OP) {
                     //  COMMENTS
                     if(line[i] == '*' && line[i + 1] == '<') {
@@ -163,6 +161,7 @@ void Lexer::process() {
                                         LexemTypes::OPERAND,
                                         ConstantPosition(lineN, i, lineN, i)));
                     }
+                    ++i;
                 }
             }
         } catch (int positionInLine) {
@@ -174,24 +173,8 @@ void Lexer::process() {
         }
     }
 
-    lexems.reverse();
     input.close();
 }
-
-/*
-//  todo words can contain both LETTERS and NUMBERS
-std::string Lexer::lexemExtraction(const char* line, CharacterTypes type) {
-    char buffer[128] {' '};
-    bool lexemType[LexemTypes::LTCount] {true};
-
-    int i;
-    for( i = 0; characters[line[i]] == type; ++i) {
-        buffer[i] = line[i];
-    }
-
-    return std::string(buffer, i);
-}
-*/
 
 std::string Lexer::unsignedExtraction(const char* line) {
     char buffer[128] {' '};

@@ -37,6 +37,9 @@ private:
     std::set<Lexem*> keywords;
     std::set<Lexem*> constants;
     //  std::list<Variable*> variables;
+
+    bool setContains(std::set<Lexem*> set, std::string key);
+    Lexem* getLexemThatMatches(std::set<Lexem*>set, std::string key);
 };
 
 

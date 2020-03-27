@@ -10,7 +10,6 @@ std::string *Keyword::toString() {
     auto* result = new std::string();
     result->append("KVRD:");
     result->append(name);
-    result->append("; ");
     return result;
 }
 

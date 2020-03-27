@@ -9,7 +9,6 @@
 std::string* Constant::toString() {
     std::string* result = new std::string();
     result->append("CONS:");
-    result->append(LexemType::names.find(type)->second);
     result->append("<");
     result->append(this->name);
     result->append(">");
