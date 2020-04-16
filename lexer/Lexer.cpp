@@ -113,9 +113,9 @@ void Lexer::process() {
                     if(setContains(keywords, word)) {
                         lexems.push_back(getLexemThatMatches(keywords, word));
                     } else {
-                        auto* con = new Constant(word, LexemTypes::CONSTANT_VAR, ConstantPosition(i, lineN, i + word.length(), lineN));
-                        lexems.push_back(con);
-                        constants.insert(con);
+                        auto* var = new Constant(word, LexemTypes::CONSTANT_VAR, ConstantPosition(i, lineN, i + word.length(), lineN));
+                        lexems.push_back(var);
+                        variables.insert(var);
                     }
 
                     i += word.length() - 1;
@@ -194,7 +194,16 @@ void Lexer::printResults() {
         std::cout << *it->toString() << '\n';
     }
 
+    std::cout << "\n Variables table: " << this->variables.size() << '\n';
+    for(auto it : variables) {
+        std::cout << *it->toString() << '\n';
+    }
+
     //  std::for_each(constants.begin(), constants.end(), [](Lexem* l) -> void { std::cout <<  l->toString(); });
 
+}
+
+std::vector<Lexem *> Lexer::getLexems() {
+    return lexems;
 }
 
