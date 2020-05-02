@@ -1,0 +1,16 @@
+PROGRAM blablas ;
+	DEFUNC
+		a5 = 5 *<fewferferf  >>>* \ 423432 , 12;
+		lala = 645 \ 21, 456   ;
+		a = 9686 \ 5675 , 543	;*<33
+		rfwf2r23er23r3
+r3>*abew323 = 24234 \ 653 , 678 ;
+
+BEGIN
+
+END
+
+*<//	<identifier> - non-null string, that starts from letter and can contain numbers
+//	<unsigned int>
+//	= \ , ;
+wewewfwf>*

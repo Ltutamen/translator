@@ -36,10 +36,14 @@ private:
     std::string wordExtraction(const char* line);
     std::string unsignedExtraction(const char* line);
 
-    std::set<Lexem*> keywords;
-    std::set<Lexem*> variables;
 
+    static std::string createErrMsg(const std::string& line, const std::string& reason, unsigned int character);
+
+    std::set<Lexem*> keywords;
+
+    std::set<Lexem*> variables;
     bool setContains(std::set<Lexem*> set, std::string key);
+
     Lexem* getLexemThatMatches(std::set<Lexem*>set, std::string key);
 };
 

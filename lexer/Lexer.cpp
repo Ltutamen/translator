@@ -96,36 +96,38 @@ void Lexer::process() {
     for(int lineN = 1; std::getline(input, line) ; ++lineN) {
         std::transform(line.begin(), line.end(), line.begin(), ::tolower);
 
-        std::cout << lineN << " : "<<line  << '\n';
-
         try {
             for (int i = 0; i < line.size(); ++i) {
                 if (characters[line[i]] == CharacterTypes::FORBIDDEN) {
-                    std::cerr << line[i] << "@" << (int)line[i] << "@@";
-                    throw lineN;
-
-                } else if(characters[line[i]] == CharacterTypes::WHITESPACE) {
+                    throw i;
+                }
+                else if(characters[line[i]] == CharacterTypes::WHITESPACE) {
                     //  skip whitespace
                     //  lexems.push_back(new Constant(currLex, ConstantPosition(i - currLex.length(), lineN, i, lineN), constants));
-                } else if (characters[line[i]] == CharacterTypes::LETTER) {
+                }
+                else if (characters[line[i]] == CharacterTypes::LETTER) {
                     //  words, constants
                     std::string word = wordExtraction(&line[i]);
                     if(setContains(keywords, word)) {
                         lexems.push_back(getLexemThatMatches(keywords, word));
-                    } else {
+                    }
+                    else {
                         auto* var = new Constant(word, LexemTypes::CONSTANT_VAR, ConstantPosition(i, lineN, i + word.length(), lineN));
                         lexems.push_back(var);
                         variables.insert(var);
                     }
 
                     i += word.length() - 1;
-                } else if(characters[line[i]] == CharacterTypes::DIGIT) {
+                }
+                else if(characters[line[i]] == CharacterTypes::DIGIT) {
                     std::string sunsigned = unsignedExtraction(&line[i]);
                     lexems.push_back(new Constant(sunsigned, LexemTypes::UNSIGNED, ConstantPosition(lineN, i, lineN, i + sunsigned.length())));
                     i += sunsigned.length() - 1;
-                } else if(characters[line[i]] == CharacterTypes::SINGLED_DIV) {
+                }
+                else if(characters[line[i]] == CharacterTypes::SINGLED_DIV) {
                     lexems.push_back(SingleElm::getSingleElm(std::string(1,  line[i])));
-                } else if(characters[line[i]] == CharacterTypes::SINGLED_OP) {
+                }
+                else if(characters[line[i]] == CharacterTypes::SINGLED_OP) {
                     //  COMMENTS
                     if(line[i] == '*' && line[i + 1] == '<') {
                         while(!(line[i] == '>' && line[i + 1] == '*')) {
@@ -154,10 +156,14 @@ void Lexer::process() {
                 }
             }
         } catch (int positionInLine) {
-            std::cerr << "Forbidden symbol [" << line[positionInLine] << "::" << (int)line[positionInLine] << "] at line " << lineN << " at pos " << positionInLine << ":{";
-            std::cerr << line << "}\n";
-        } catch (...) {
-            std::cerr << "General exception on line " [ lineN] << ';';
+            std::cerr << "Exception on line " << lineN << ":\n";
+            std::cerr << Lexer::createErrMsg(line, "Forbidden character ", positionInLine);
+
+            exit(2);
+        } catch (std::string msg) {
+            std::cerr << "General exception on line " << lineN << ":\n";
+            std::cerr << "err msg: " << msg ;
+
             exit(2);
         }
     }
@@ -171,6 +177,10 @@ std::string Lexer::unsignedExtraction(const char* line) {
     int i;
     for( i = 0; characters[line[i]] == CharacterTypes::DIGIT; ++i) {
         buffer[i] = line[i];
+    }
+
+    if(characters[line[i]] == CharacterTypes::LETTER) {
+        throw Lexer::createErrMsg(std::string(line), "unexpected character in unsigned lexem:", i);
     }
 
     return std::string(buffer, i);
@@ -205,5 +215,15 @@ void Lexer::printResults() {
 
 std::vector<Lexem *> Lexer::getLexems() {
     return lexems;
+}
+
+std::string Lexer::createErrMsg(const std::string& line, const std::string& reason, unsigned int character) {
+    unsigned tabs = std::count(line.begin(), line.end(), '\t');
+    return
+    reason +
+    std::string("\n") +
+    line +
+    std::string("\n") +
+    std::string(character + tabs * 2, '-') + "^";
 }
 

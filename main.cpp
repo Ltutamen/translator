@@ -2,8 +2,13 @@
 #include "lexer/Lexer.h"
 #include "syntax-an/Analyzer.h"
 
-int main() {
-    Lexer lexer("../lexer/program.txt");
+int main(int argc, char* argv[]) {
+    std::string fpath("../lexer/program.txt");
+    if(argc == 2) {
+        fpath = std::string(argv[1]);
+    }
+
+    Lexer lexer(fpath);
     lexer.process();
     lexer.printResults();
 
